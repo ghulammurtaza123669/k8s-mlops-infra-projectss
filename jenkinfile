@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    environment {
+        // MLflow tracking URI inside the environment context
+        MLFLOW_TRACKING_URI = 'http://localhost:5000'
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                echo 'Stage 1: Fetching code from repository...'
+                // Locally execution ke liye checkout simulate ho raha hai
+                sh 'ls -la'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                echo 'Stage 2: Installing required ML packages...'
+                sh 'pip install mlflow scikit-learn --break-system-packages'
+            }
+        }
+
+        stage('Execute ML Pipeline') {
+            steps {
+                echo 'Stage 3: Running Model Training & Logging Metrics...'
+                // Hum main home folder se script trigger kar rahe hain
+                sh 'python3 ~/train.py'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '🎉 MLOps Pipeline executed successfully! Model metrics are safely logged.'
+        }
+        failure {
+            echo '❌ Pipeline failed. Please check the logs.'
+        }
+    }
+}
+
